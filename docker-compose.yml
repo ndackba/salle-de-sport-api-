@@ -1,0 +1,36 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sallesport-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-salle_de_sport}
+      MYSQL_USER: ${MYSQL_USER:-sallesport_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sallesport_pass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: sallesport-api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-salle_de_sport}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-sallesport_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-sallesport_pass}
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
