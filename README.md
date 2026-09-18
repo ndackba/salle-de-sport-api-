@@ -5,7 +5,7 @@
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé et démarré
 
 ### Configuration
-
+Prérequis : Java 21
 Crée un fichier `.env` à la racine du projet (à ne jamais versionner) :
 
 ```env
